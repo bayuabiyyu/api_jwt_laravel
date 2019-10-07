@@ -91,13 +91,24 @@ class BarangController extends Controller
      */
     public function show($id)
     {
-        $data = $this->barang->where('id', $id)->firstOrFail();
-        $response = [
-            'success' => true,
-            'code' => 200,
-            'message' => 'OK',
-            'data' => $data,
-        ];
+        $data = $this->barang->where('id', $id)->first();
+
+        if($data){
+            $response = [
+                'success' => true,
+                'code' => 200,
+                'message' => 'OK',
+                'data' => $data,
+            ];
+        }else{
+            $response = [
+                'success' => false,
+                'code' => 400,
+                'message' => 'Not Found',
+                'data' => $data,
+            ];
+        }
+
         return response()->json($response, $response['code']);
     }
 
@@ -119,18 +130,18 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(BarangRequest $request, $id)
     {
         $update = $this->barang->where('id', $id)
                     ->update([
                         'nama_barang' => $request->nama_barang
                     ]);
         if($update){
-        $response = [
-            'success' => true,
-            'code' => 200,
-            'message' => 'OK',
-        ];
+            $response = [
+                'success' => true,
+                'code' => 200,
+                'message' => 'OK',
+            ];
         }else{
             $response = [
                 'success' => false,
@@ -139,7 +150,6 @@ class BarangController extends Controller
             ];
         }
 
-        // $response = ['code' => 400, 'data' => $request->all()];
         return response()->json($response, $response['code']);           
     }
 
