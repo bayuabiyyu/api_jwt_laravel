@@ -32,11 +32,12 @@ class BarangController extends Controller
         $data = $this->barang->all();
         $response = [
             'success' => true,
+            'code' => 200,
             'message' => 'OK',
             'data' => $data,
-            'code' => 200
+
         ];
-        return response()->json($response, 200);
+        return response()->json($response, $response['code']);
     }
 
     /**
@@ -63,15 +64,23 @@ class BarangController extends Controller
             'nama_barang' => $request->nama_barang
         ];
 
-        $insert = $this->barang->insert([$data]);
+        $insert = $this->barang->create($data);
 
-        $response = [
-            'success' => true,
-            'code' => 200,
-            'message' => 'OK',
-        ];
+        if($insert){
+            $response = [
+                'success' => true,
+                'code' => 200,
+                'message' => 'OK',
+            ];
+        }else{
+            $response = [
+                'success' => false,
+                'code' => 500,
+                'message' => 'Error',
+            ];
+        }
 
-        return response()->json($response, 200);
+        return response()->json($response, $response['code']);
     }
 
     /**
@@ -82,7 +91,14 @@ class BarangController extends Controller
      */
     public function show($id)
     {
-        //
+        $data = $this->barang->where('id', $id)->firstOrFail();
+        $response = [
+            'success' => true,
+            'code' => 200,
+            'message' => 'OK',
+            'data' => $data,
+        ];
+        return response()->json($response, $response['code']);
     }
 
     /**
@@ -105,7 +121,26 @@ class BarangController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $update = $this->barang->where('id', $id)
+                    ->update([
+                        'nama_barang' => $request->nama_barang
+                    ]);
+        if($update){
+        $response = [
+            'success' => true,
+            'code' => 200,
+            'message' => 'OK',
+        ];
+        }else{
+            $response = [
+                'success' => false,
+                'code' => 500,
+                'message' => 'Error',
+            ];
+        }
+
+        // $response = ['code' => 400, 'data' => $request->all()];
+        return response()->json($response, $response['code']);           
     }
 
     /**
@@ -116,6 +151,20 @@ class BarangController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $delete = $this->barang->where('id', $id)->delete();
+        if($delete){
+            $response = [
+                'success' => true,
+                'code' => 200,
+                'message' => 'OK',
+            ];
+        }else{
+            $response = [
+                'success' => false,
+                'code' => 500,
+                'message' => 'Error',
+            ];
+        }
+        return response()->json($response, $response['code']);
     }
 }
