@@ -26,15 +26,12 @@ class BarangRequest extends FormRequest
      */
     public function rules()
     {
-
         $method = $this->method();
-        $rules = "";
-
         switch ($method) {
             case "GET":
                 return [];
                     break;
-            
+
             case "POST":
                 return $this->createRules();
                     break;
@@ -46,7 +43,7 @@ class BarangRequest extends FormRequest
             case "PATCH":
                 return $this->updateRules();
                     break;
-            
+
             case "DELETE":
                 return [];
                     break;
@@ -88,16 +85,16 @@ class BarangRequest extends FormRequest
     public function updateRules()
     {
         $rules = [
-            'kode_barang' => 'required|max:50|unique:barang,kode_barang,'.$this->get('id'),
+            'kode_barang' => 'max:50|unique:barang,kode_barang,'.$this->route('id'),
             'nama_barang' => 'required',
         ];
         return $rules;
     }
 
     /**
-     * 
+     *
      * Custom response struktur array json
-     * 
+     *
      */
 
     protected function failedValidation(Validator $validator)

@@ -9,7 +9,7 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 use App\User;
 
-class UserController extends Controller
+class LoginApiController extends Controller
 {
     public function login(Request $request)
     {
@@ -51,6 +51,18 @@ class UserController extends Controller
         $token = JWTAuth::fromUser($user);
         return response()->json(compact('user', 'token'), 201);
 
+    }
+
+    public function logout(Request $request){
+        $this->validate($request, ['token' => 'required']);
+        try {
+            JWTAuth::invalidate($request->input('token'));
+            $data = ['success' => true, 'message' => 'Logout Berhasil'];
+            return response()->json($data, 200);
+        } catch (JWTException $e) {
+            $data = ['success' => false, 'message' => 'Logout Gagal'];
+            return response()->json($data, 500);
+        }
     }
 
     public function getAuthenticatedUser()

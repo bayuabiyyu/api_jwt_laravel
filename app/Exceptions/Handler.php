@@ -4,6 +4,8 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Database\Eloquent\ModelNotFoundException as ModelNotFoundException;
+use Illuminate\Database\QueryException as QueryException;
 
 class Handler extends ExceptionHandler
 {
@@ -46,6 +48,24 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ( $request->wantsJson() || $request->ajax() ) {
+
+            // If exception data not found
+            if($exception instanceof ModelNotFoundException){
+                $data = [
+                    'success' => false,
+                    'message' => 'Data not found',
+                ];
+            }else if($exception instanceof QueryException){
+                $data = [
+                    'success' => false,
+                    'message' => 'Query error',
+                ];
+            }
+
+            return response()->json($data, 400);
+
+        }
         return parent::render($request, $exception);
     }
 }

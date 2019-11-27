@@ -18,12 +18,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 
-Route::post('register', 'UserController@register');
-Route::post('login', 'UserController@login');
+Route::post('register', 'LoginApiController@register');
+Route::post('login', 'LoginApiController@login');
+Route::post('logout', 'LoginApiController@logout');
 
-Route::get('book', 'BookController@book');
+Route::get('user', 'LoginApiController@getAuthenticatedUser')->middleware('jwt.verify');
 
-Route::get('bookall', 'BookController@bookAuth')->middleware('jwt.verify');
-Route::get('user', 'UserController@getAuthenticatedUser')->middleware('jwt.verify');
+// Route::get('book', 'BookController@book');
+// Route::get('bookall', 'BookController@bookAuth')->middleware('jwt.verify');
 
-Route::resource('barang', 'BarangController')->middleware('jwt.verify');
+Route::group(['middleware' => ['jwt.verify']], function () {
+    Route::resource('barang', 'BarangController');
+});

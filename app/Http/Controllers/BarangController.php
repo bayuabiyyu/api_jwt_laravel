@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Auth;
 use App\Barang;
 use App\Http\Requests\BarangRequest;
+use App\Http\Resources\BarangCollection;
+use App\Http\Resources\BarangResource;
 
 class BarangController extends Controller
 {
@@ -14,7 +15,7 @@ class BarangController extends Controller
 
     /**
      * Constructor init variabel model from global property
-     * 
+     *
      */
 
     public function __construct(Barang $barang)
@@ -30,14 +31,10 @@ class BarangController extends Controller
     public function index()
     {
         $data = $this->barang->all();
-        $response = [
+        return (new BarangCollection($data))->additional([
             'success' => true,
-            'code' => 200,
-            'message' => 'OK',
-            'data' => $data,
-
-        ];
-        return response()->json($response, $response['code']);
+            'message' => 'found data',
+        ]);
     }
 
     /**
@@ -58,28 +55,16 @@ class BarangController extends Controller
      */
     public function store(BarangRequest $request)
     {
-
         $data = [
             'kode_barang' => $request->kode_barang,
             'nama_barang' => $request->nama_barang
         ];
-
-        $insert = $this->barang->create($data);
-
-        if($insert){
-            $response = [
-                'success' => true,
-                'code' => 200,
-                'message' => 'OK',
-            ];
-        }else{
-            $response = [
-                'success' => false,
-                'code' => 500,
-                'message' => 'Error',
-            ];
-        }
-
+        $this->barang->create($data);
+        $response = [
+            'success' => true,
+            'code' => 200,
+            'message' => 'OK, Data has been saved',
+        ];
         return response()->json($response, $response['code']);
     }
 
@@ -91,25 +76,11 @@ class BarangController extends Controller
      */
     public function show($id)
     {
-        $data = $this->barang->where('id', $id)->first();
-
-        if($data){
-            $response = [
-                'success' => true,
-                'code' => 200,
-                'message' => 'OK',
-                'data' => $data,
-            ];
-        }else{
-            $response = [
-                'success' => false,
-                'code' => 400,
-                'message' => 'Not Found',
-                'data' => $data,
-            ];
-        }
-
-        return response()->json($response, $response['code']);
+        $data = $this->barang->where('id', $id)->firstOrFail();
+        return (new BarangResource($data))->additional([
+            'success' => true,
+            'message' => 'found data',
+        ]);
     }
 
     /**
@@ -130,27 +101,18 @@ class BarangController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(BarangRequest $request, $id)
+    public function update(Request $request, $id)
     {
-        $update = $this->barang->where('id', $id)
-                    ->update([
-                        'nama_barang' => $request->nama_barang
-                    ]);
-        if($update){
-            $response = [
-                'success' => true,
-                'code' => 200,
-                'message' => 'OK',
-            ];
-        }else{
-            $response = [
-                'success' => false,
-                'code' => 500,
-                'message' => 'Error',
-            ];
-        }
-
-        return response()->json($response, $response['code']);           
+        $data = [
+            'nama_barang' => $request->nama_barang
+        ];
+        $this->barang->where('id', $id)->firstOrFail()->update($data);
+        $response = [
+            'success' => true,
+            'code' => 200,
+            'message' => 'OK, Data has been update',
+        ];
+        return response()->json($response, $response['code']);
     }
 
     /**
@@ -161,20 +123,12 @@ class BarangController extends Controller
      */
     public function destroy($id)
     {
-        $delete = $this->barang->where('id', $id)->delete();
-        if($delete){
-            $response = [
-                'success' => true,
-                'code' => 200,
-                'message' => 'OK',
-            ];
-        }else{
-            $response = [
-                'success' => false,
-                'code' => 500,
-                'message' => 'Error',
-            ];
-        }
+        $this->barang->where('id', $id)->firstOrFail()->delete();
+        $response = [
+            'success' => true,
+            'code' => 200,
+            'message' => 'OK, Data has been delete',
+        ];
         return response()->json($response, $response['code']);
     }
 }
